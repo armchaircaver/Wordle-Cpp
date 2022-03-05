@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 const int MAXPRIME = 100001;
-int prime[100001];
+int prime[MAXPRIME];
 
 std::vector<std::string> solutions;
 
@@ -60,18 +60,9 @@ void SieveOfEratosthenes(int n) {
 
 
 int main() {
-    std::string sol = "arise";
-    std::string guess = "baice";
-    printf("%s\n", pattern(sol, guess).c_str());
-
-    sol = "abcde";  guess = "aaabf";
-    printf("%s\n", pattern(sol, guess).c_str());
-
-    SieveOfEratosthenes(MAXPRIME);
+     SieveOfEratosthenes(MAXPRIME);
     printf("%zd primes\n", solutions.size());
-    //for (auto  s : solutions)
-    //    printf("%s\n", s.c_str() );
-
+ 
     std::unordered_map<std::string, int> patternmap;
     int i = 0;
     for (std::string a : {"G", "Y", "."})
@@ -79,17 +70,17 @@ int main() {
             for (std::string c : {"G", "Y", "."})
                 for (std::string d : {"G", "Y", "."})
                     for (std::string e : {"G", "Y", "."}) {
-                        printf("%s\n", (a + b + c + d + e).c_str() );
+                        //printf("%s\n", (a + b + c + d + e).c_str() );
                         
                         patternmap[a + b + c + d + e] = i;
                         i++;
                     }
     printf("%zd patternmap items\n", patternmap.size());
 
-    std::unordered_map<std::string, int[243]> guessmap;
+    uint64_t smallest = 1ULL << 63;
 
     for (auto guess : solutions) {
-        printf("collecting guess %s\n", guess.c_str());
+        //printf("analysing guess %s\n", guess.c_str());
 
         int collection[243]{0};
         for (int i = 0; i < 243; i++)
@@ -100,27 +91,18 @@ int main() {
             int pm = patternmap[p];
             collection[pm]++;
         }
-        // not sure why I can't assign the whole array at once
-        for (int i=0;i<243;i++)
-            guessmap[guess][i] = collection[i];
-    }
-    for (auto x : solutions) {
         int sum = 0;
         for (int i = 0; i < 243; i++)
-            sum += guessmap[x][i];
+            sum += collection[i];
         if (sum != solutions.size()) {
-            printf("mismatch 1\n");
+            printf("mismatch \n");
             exit(1);
         }
-    }
-    printf(" no mismatches\n");
-
-    uint64_t smallest = 1ULL << 63;
-    for (auto guess : solutions) {
+ 
         uint64_t M = 0;
         for (int i = 0; i < 243; i++)
-            M += (uint64_t)guessmap[guess][i] * (uint64_t)guessmap[guess][i];
-        if (M < smallest) {
+            M += (uint64_t)collection[i] * (uint64_t)collection[i];
+        if (M <= smallest) {
             printf("%s, %lld, %f\n", guess.c_str(), M, float(M) / solutions.size());
             smallest = M;
         }
