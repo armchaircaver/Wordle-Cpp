@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ponder this March 2022", "P
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ponder This March 2022 bonus", "Ponder This March 2022 bonus\Ponder This March 2022 bonus.vcxproj", "{C77ACC03-F62B-4422-B9EC-9AF6B81C6A4C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test all patern construction", "Test all patern construction\Test all patern construction.vcxproj", "{3002FC1D-7676-4E7F-AFE3-4E87A7BC1D43}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{C77ACC03-F62B-4422-B9EC-9AF6B81C6A4C}.Release|x64.Build.0 = Release|x64
 		{C77ACC03-F62B-4422-B9EC-9AF6B81C6A4C}.Release|x86.ActiveCfg = Release|Win32
 		{C77ACC03-F62B-4422-B9EC-9AF6B81C6A4C}.Release|x86.Build.0 = Release|Win32
+		{3002FC1D-7676-4E7F-AFE3-4E87A7BC1D43}.Debug|x64.ActiveCfg = Debug|x64
+		{3002FC1D-7676-4E7F-AFE3-4E87A7BC1D43}.Debug|x64.Build.0 = Debug|x64
+		{3002FC1D-7676-4E7F-AFE3-4E87A7BC1D43}.Debug|x86.ActiveCfg = Debug|Win32
+		{3002FC1D-7676-4E7F-AFE3-4E87A7BC1D43}.Debug|x86.Build.0 = Debug|Win32
+		{3002FC1D-7676-4E7F-AFE3-4E87A7BC1D43}.Release|x64.ActiveCfg = Release|x64
+		{3002FC1D-7676-4E7F-AFE3-4E87A7BC1D43}.Release|x64.Build.0 = Release|x64
+		{3002FC1D-7676-4E7F-AFE3-4E87A7BC1D43}.Release|x86.ActiveCfg = Release|Win32
+		{3002FC1D-7676-4E7F-AFE3-4E87A7BC1D43}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

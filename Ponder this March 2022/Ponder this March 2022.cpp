@@ -15,26 +15,23 @@ std::string  pattern(std::string& solutionword, std::string& guess) {
 
     // find greens first, and remove the letter from the solution
     // so that we don't get false yellows for a repeated letter in the guess word
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
         if (solutionword[i] == guess[i]) {
             p[i] = 'G';
             list_solutionword[i] = '.';
         }
-    }
 
     // find yellows, removing a matched letter from the solution
     // so that we don't get further false yellows for a repeated letter in the guess word
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
         // if guess[i] is in list_solutionword - this is a bottleneck
-        if (list_solutionword.find(guess[i]) != std::string::npos) {
-        // if (strchr(list_solutionword.c_str(), guess[i])){
-
+        if (list_solutionword.find(guess[i]) != std::string::npos)
+            // if (strchr(list_solutionword.c_str(), guess[i]))
             if (p[i] != 'G') {
                 p[i] = 'Y';
                 list_solutionword[list_solutionword.find(guess[i])] = '.';
             }
-        }
-    }
+
     return p;
 }
 
@@ -47,12 +44,10 @@ void SieveOfEratosthenes(int n) {
     prime[0] = 0;
     prime[1] = 0;
     for (int p = 2; p * p <= MAXPRIME; p++)
-    {
-        if (prime[p]) {
+        if (prime[p])
             for (int i = p * 2; i <= MAXPRIME; i += p)
                 prime[i] = 0;
-        }
-    }
+
     for (int p = 10000; p < MAXPRIME; p++)
         if (prime[p])
             solutions.push_back(std::to_string(p));
