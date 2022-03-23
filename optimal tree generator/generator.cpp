@@ -23,6 +23,7 @@ std::string lastpatternprinted = "?????";
 
 void  traverse(int depth, std::string& startguess, strvec_t& inputlist) {
 
+    //printf("traverse %zd\n", inputlist.size());
 
     std::map < std::string, strvec_t>  pg;
     for (auto sol : inputlist) {
@@ -67,6 +68,8 @@ void  traverse(int depth, std::string& startguess, strvec_t& inputlist) {
     }
 }
 
+std::vector<std::string> solutions;
+ std::vector<std::string> alloptions;
 int main() {
     //std::string startguess = "roate";
     //static std::vector < std::string>  tests = { "aback", "abase", "abate", "abbey", "abbot", "abhor", "abide", "abled", "abode", "abort", "about", "above", "abuse", "abyss" };
@@ -76,6 +79,19 @@ int main() {
     std::string next = bestguess(tests);
     printf("next = %s\n", next.c_str());
     */
+
+    for (int i = 0; i < sizeof(solutions_c) / sizeof(solutions_c[0]); i++)
+        solutions.push_back(solutions_c[i]);
+    printf("solutions vector initialised, %zd items\n", solutions.size());
+    //printf("item size %zd\n", solutions[0].size());
+    //for (int i = 0; i < 10; i++)
+    //    printf(" %s\n", solutions[i].c_str());
+
+    for (int i = 0; i < sizeof(alloptions_c) / sizeof(alloptions_c[0]); i++)
+        alloptions.push_back(alloptions_c[i]);
+    printf("alloptions vector initialised, %zd items\n", alloptions.size());
+    //for (int i = 0; i < 10; i++)
+    //    printf(" %s\n", alloptions[i].c_str());
 
     std::string startguess = "salet";
     traverse(1, startguess, solutions);

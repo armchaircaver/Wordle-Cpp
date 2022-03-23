@@ -1,5 +1,6 @@
 #include "wordlists.h"
-#include <unordered_map>
+//#include <unordered_map>
+#include "robin_hood.h"
 #include <algorithm>
 #include <stdexcept>
 #include "recursive.h"
@@ -61,7 +62,8 @@ std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std:
 
     bypattern_t solsbypattern;
 
-    std::unordered_map < std::string, int> totalsbypattern;
+    //std::unordered_map < std::string, int> totalsbypattern;
+    robin_hood::unordered_flat_map< std::string, int> totalsbypattern;
 
     for (auto guess : alloptions) {
 
@@ -128,7 +130,8 @@ double  avg(bypattern_t & distribution) {
     return numerator / (double)denominator;
 }
 
-std::unordered_map<std::string, double> minavg_cache;
+//std::unordered_map<std::string, double> minavg_cache;
+robin_hood::unordered_flat_map< std::string, double> minavg_cache;
 
 double minavg(strvec_t& solutions) {
 
@@ -157,9 +160,12 @@ double minavg(strvec_t& solutions) {
     minavg_cache[strsolutions] = m;
     return m;
 }
-
+//------------------------------------------------------------------------------------------------------------------------------------
 std::string bestguess(strvec_t &solutions) {
     // find the guess that produces the best average for the solutions
+
+    //printf(" % zd alloptions\n", alloptions.size());
+    //exit(0);
 
     if (solutions.size() <= 2) {
         //if verbose : print("no need to search")
