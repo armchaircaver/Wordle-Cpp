@@ -5,8 +5,6 @@
 #include "recursive.h"
 #include <map>
 
-
-
 std::string BGY(std::string p) {
     std::string x = p;
     std::replace(x.begin(), x.end(), '.', 'B');
@@ -25,13 +23,8 @@ void  traverse(int depth, std::string& startguess, strvec_t& inputlist) {
 
     //printf("traverse %zd\n", inputlist.size());
 
-    std::map < std::string, strvec_t>  pg;
-    for (auto sol : inputlist) {
-        std::string p = pattern(sol, startguess);
-        pg[p].push_back(sol);
-    }
-
-
+    bypattern_t  pg = splitbypattern(startguess, inputlist);
+    
     printf(" %s ", startguess.c_str());
 
     for (auto x : pg) {
@@ -41,9 +34,7 @@ void  traverse(int depth, std::string& startguess, strvec_t& inputlist) {
 
         std::string p = x.first;
 
-        //if depth == 1 :
-        //    clearcaches()
-
+ 
         if (lastpatternprinted == "GGGGG") {
             std::string printstr = std::string(13 * (depth - 1) + 6, ' ') + BGY(p) + std::to_string(depth);
             if (p == "GGGGG") printstr += "\n";
@@ -62,8 +53,8 @@ void  traverse(int depth, std::string& startguess, strvec_t& inputlist) {
             totalguesses += depth;
         }
         else {
-            std::string g2 = bestguess(pg[p]);
-            traverse(depth + 1, g2, pg[p]);
+            bestguess_t bg = bestguess(pg[p]);
+            traverse(depth + 1, bg.bestguess, pg[p]);
         }
     }
 }
@@ -83,16 +74,11 @@ int main() {
     for (int i = 0; i < sizeof(solutions_c) / sizeof(solutions_c[0]); i++)
         solutions.push_back(solutions_c[i]);
     printf("solutions vector initialised, %zd items\n", solutions.size());
-    //printf("item size %zd\n", solutions[0].size());
-    //for (int i = 0; i < 10; i++)
-    //    printf(" %s\n", solutions[i].c_str());
-
+   
     for (int i = 0; i < sizeof(alloptions_c) / sizeof(alloptions_c[0]); i++)
         alloptions.push_back(alloptions_c[i]);
     printf("alloptions vector initialised, %zd items\n", alloptions.size());
-    //for (int i = 0; i < 10; i++)
-    //    printf(" %s\n", alloptions[i].c_str());
-
+  
     std::string startguess = "salet";
     traverse(1, startguess, solutions);
 

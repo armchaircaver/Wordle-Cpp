@@ -1,6 +1,4 @@
 #include "wordlists.h"
-//#include <unordered_map>
-#include "robin_hood.h"
 #include <algorithm>
 #include <stdexcept>
 #include "recursive.h"
@@ -8,7 +6,7 @@
 double powers[1000];
 int powersinit = 0;
 
-std::unordered_map< std::string, std::string> pattern_cache;
+robin_hood::unordered_flat_map< std::string,  std::string> pattern_cache;
 
 void clearpatterncache() {
     pattern_cache.clear();
@@ -65,6 +63,7 @@ std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std:
     //std::unordered_map < std::string, int> totalsbypattern;
     robin_hood::unordered_flat_map< std::string, int> totalsbypattern;
 
+    std::string p;
     for (auto guess : alloptions) {
 
         double squaresum = 0.0;
@@ -72,16 +71,14 @@ std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std:
         totalsbypattern.clear();
 
         for (auto sol : solutions) {
-            std::string p = pattern(sol, guess);
-            totalsbypattern[p] ++;
+            p = pattern(sol, guess);
+            int x = ++totalsbypattern[p];
 
             // accumulate the sum of squares of totals for each pattern
             // incrementing the sum of squares : x * *2 - (x - 1) * *2 = 2 * x - 1
-            // squaresum += 2 * totalsbypattern[p] - 1
+            // squaresum += 2 * x - 1
 
             // however, this seems to produce a better shortlist
-            int x = totalsbypattern[p];
-            //squaresum += powers[x] - powers[x - 1];
             squaresum += powers[x]-powers[x-1];
 
 
@@ -134,45 +131,49 @@ double  avg(bypattern_t & distribution) {
 robin_hood::unordered_flat_map< std::string, double> minavg_cache;
 
 double minavg(strvec_t& solutions) {
-
-    std::string strsolutions;
-    for (auto s : solutions)
-        strsolutions += s;
-    if (minavg_cache.find(strsolutions) != minavg_cache.end())
-        return minavg_cache[strsolutions];
-
-    double  m = 10000000000000000000.0;
-
-    std::vector< std::pair < double, std::string>> slist = shortlist(15, solutions);
-
-    for (auto x : slist) {
-        std::string guess = x.second;
-
-        bypattern_t solsbypattern;
-        for (auto sol : solutions) {
-            std::string p = pattern(sol, guess);
-            solsbypattern[p].push_back(sol);
-        }
-        double a = avg(solsbypattern);
-        if (a < m) 
-            m = a;
-    }
-    minavg_cache[strsolutions] = m;
-    return m;
+    bestguess_t bg = bestguess(solutions);
+    return bg.average;
 }
 //------------------------------------------------------------------------------------------------------------------------------------
-std::string bestguess(strvec_t &solutions) {
+bypattern_t splitbypattern(std::string& guess, strvec_t& solutions) {
+    bypattern_t solsbypattern;
+    for (auto sol : solutions) {
+        std::string p = pattern(sol, guess);
+        solsbypattern[p].push_back(sol);
+    }
+    return solsbypattern;
+
+}
+//------------------------------------------------------------------------------------------------------------------------------------
+std::string concat(strvec_t v) {
+    std::string res;
+    for (auto s : v)
+        res += s+",";
+    return res;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------
+robin_hood::unordered_flat_map< std::string, bestguess_t> bestguess_cache;
+
+bestguess_t bestguess(strvec_t &solutions) {
     // find the guess that produces the best average for the solutions
 
-    //printf(" % zd alloptions\n", alloptions.size());
-    //exit(0);
+ 
+    if (solutions.size() == 1)
+        //no need to search
+        return bestguess_t{ 0.0, solutions[0] };
+ 
+    if (solutions.size() == 2)
+        //no need to search
+        return bestguess_t{ 0.5, solutions[0] };
 
-    if (solutions.size() <= 2) {
-        //if verbose : print("no need to search")
-        return solutions[0];
+    // see if we have cached the result
+    std::string cs = concat(solutions);
+    if (bestguess_cache.find(cs) != bestguess_cache.end()) {
+        //printf("bestguess cache used for %s\n", cs.c_str());
+        return bestguess_cache[cs];
     }
-
-    //starttime = perf_counter()
+    
     double bestavg = powf(10.0, 10);
     std::string bestguess = "?????";
 
@@ -182,15 +183,17 @@ std::string bestguess(strvec_t &solutions) {
     if (solutions.size() < 25) {
         for (auto guess : solutions) {
 
-            bypattern_t solsbypattern;
+            bypattern_t solsbypattern = splitbypattern(guess, solutions);
+            /*
             for (auto sol : solutions) {
                 std::string p = pattern(sol, guess);
                 solsbypattern[p].push_back(sol);
             }
+            */ 
 
             if (solsbypattern.size() == solutions.size())
                 // can't do better than this
-                return guess;
+                return bestguess_t{ (float)(solutions.size()-1)/(float)solutions.size(), guess };
 
             if (solsbypattern.size() == solutions.size() - 1)
                 reserve_guess = guess;
@@ -207,7 +210,7 @@ std::string bestguess(strvec_t &solutions) {
     }
     if (reserve_guess != "?????")
         // we have found the next best to a full spread, and can't do better by calling shortlist
-        return reserve_guess;
+        return bestguess_t{ 1.0, reserve_guess };
 
     std::vector< std::pair < double, std::string>> sl = shortlist(15, solutions);
     
@@ -228,7 +231,7 @@ std::string bestguess(strvec_t &solutions) {
 
         if (solsbypattern.size() == solutions.size())
             // can't do better than this
-            return guess;
+            return bestguess_t{ 1.0, guess };
 
         double a = avg(solsbypattern);
         //printf("shortlist guess %s, average %f\n", guess.c_str(), a);
@@ -243,5 +246,6 @@ std::string bestguess(strvec_t &solutions) {
         }
     }
 
-    return bestguess;
+    bestguess_cache[cs] = bestguess_t{ bestavg, bestguess };
+    return bestguess_t{ bestavg, bestguess };
 }
