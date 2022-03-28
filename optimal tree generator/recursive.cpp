@@ -1,4 +1,4 @@
-#include "wordlists.h"
+ #include "wordlists.h"
 #include <algorithm>
 #include <stdexcept>
 #include "recursive.h"
@@ -7,6 +7,8 @@ double powers[1000];
 int powersinit = 0;
 
 robin_hood::unordered_flat_map< std::string,  std::string> pattern_cache;
+
+PrimaryWords primarywords;
 
 void clearpatterncache() {
     pattern_cache.clear();
@@ -19,6 +21,7 @@ std::string  pattern(std::string& solutionword, std::string& guess) {
 
     std::string list_solutionword = solutionword;
     std::string p = ".....";
+    //int solbitmap = primarywords.wordbitmap[solutionword];
 
     // find greens first, and remove the letter from the solution
     // so that we don't get false yellows for a repeated letter in the guess word
@@ -30,20 +33,25 @@ std::string  pattern(std::string& solutionword, std::string& guess) {
 
     // find yellows, removing a matched letter from the solution
     // so that we don't get further false yellows for a repeated letter in the guess word
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 5; i++) {
+        if (p[i] == 'G')
+            continue;
+        //if (((guess[i] - 'a') & solbitmap) == 0)
+        //    continue;
+
         // if guess[i] is in list_solutionword - this is a bottleneck
-        if (list_solutionword.find(guess[i]) != std::string::npos)
-            // if (strchr(list_solutionword.c_str(), guess[i]))
-            if (p[i] != 'G') {
-                p[i] = 'Y';
-                list_solutionword[list_solutionword.find(guess[i])] = '.';
-            }
+        //if (list_solutionword.find(guess[i]) != std::string::npos)
+        if (strchr(list_solutionword.c_str(), guess[i]))
+        {
+            p[i] = 'Y';
+            list_solutionword[list_solutionword.find(guess[i])] = '.';
+        }
+    }
     //pattern_cache[guess+solutionword] = p;
     return p;
 }
 
-
-std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std::string> & solutions) {
+std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std::string> & inputsols) {
 
     // returns a list of pairs (squaresum, guess)
     // The list returned is the list for guesses with the smallest squaresum
@@ -61,18 +69,21 @@ std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std:
     bypattern_t solsbypattern;
 
     //std::unordered_map < std::string, int> totalsbypattern;
-    robin_hood::unordered_flat_map< std::string, int> totalsbypattern;
+    robin_hood::unordered_flat_map< int, int> totalsbypattern;
 
+    //int totalsbypattern[1024] = { 0 };
     std::string p;
-    for (auto guess : alloptions) {
+    for (auto guess : primarywords.alloptions) {
 
         double squaresum = 0.0;
         solsbypattern.clear();
         totalsbypattern.clear();
+        //memset(totalsbypattern, 0, sizeof(totalsbypattern));
 
-        for (auto sol : solutions) {
+        for (auto sol : inputsols) {
             p = pattern(sol, guess);
-            int x = ++totalsbypattern[p];
+            //int x = ++totalsbypattern[str2int(p)];
+           int x = ++totalsbypattern[pattern2smallint(p)];
 
             // accumulate the sum of squares of totals for each pattern
             // incrementing the sum of squares : x * *2 - (x - 1) * *2 = 2 * x - 1
@@ -87,7 +98,7 @@ std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std:
         }
         // we have found a guess that distributes each solution in a different pattern
         // and one of the solutions is a guess 
-        if (squaresum == solutions.size() && std::find(solutions.begin(), solutions.end(), guess) != solutions.end()) {
+        if (squaresum == inputsols.size() && std::find(inputsols.begin(), inputsols.end(), guess) != inputsols.end()) {
             slist.clear();
             slist.push_back(std::make_pair(squaresum, guess));
             return slist;
@@ -111,7 +122,7 @@ double  avg(bypattern_t & distribution) {
 
         denominator += (int)p.second.size();
 
-        if (p.first == "GGGGG")
+        if (int2str(p.first) == "GGGGG")
             continue;
 
         if (p.second.size() == 1)
@@ -139,7 +150,7 @@ bypattern_t splitbypattern(std::string& guess, strvec_t& solutions) {
     bypattern_t solsbypattern;
     for (auto sol : solutions) {
         std::string p = pattern(sol, guess);
-        solsbypattern[p].push_back(sol);
+        solsbypattern[str2int(p)].push_back(sol);
     }
     return solsbypattern;
 
@@ -153,6 +164,28 @@ std::string concat(strvec_t v) {
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
+uint64_t str2int(std::string s) {
+    uint64_t i = 0ull;
+    memcpy(&i, s.c_str(), 5);
+    return i;
+}
+std::string int2str(uint64_t i) {
+    char c[6] = { '?','?','?','?','?', 0 };
+    memcpy(&c, &i, 5);
+    return std::string(c);
+}
+//------------------------------------------------------------------------------------------------------------------------------------
+int pattern2smallint(std::string s) {
+    int i = 0;
+    int pos = 0;
+    for (auto c : s) {
+        i |= (c & 3) << pos;
+        pos += 2;
+    }
+    return i;
+}
+//------------------------------------------------------------------------------------------------------------------------------------
+
 robin_hood::unordered_flat_map< std::string, bestguess_t> bestguess_cache;
 
 bestguess_t bestguess(strvec_t &solutions) {
@@ -226,7 +259,7 @@ bestguess_t bestguess(strvec_t &solutions) {
         bypattern_t solsbypattern;
         for (auto sol : solutions) {
             std::string p = pattern(sol, guess);
-            solsbypattern[p].push_back(sol);
+            solsbypattern[str2int(p)].push_back(sol);
         }
 
         if (solsbypattern.size() == solutions.size())

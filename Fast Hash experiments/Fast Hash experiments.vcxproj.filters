@@ -15,24 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="wordlists.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="recursive.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="robin_hood.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="recursive.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="generator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="wordlists.cpp">
+    <ClCompile Include="Fast hash experimentsSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

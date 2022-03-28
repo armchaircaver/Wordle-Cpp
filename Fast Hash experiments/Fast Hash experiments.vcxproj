@@ -18,21 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="recursive.h" />
-    <ClInclude Include="robin_hood.h" />
-    <ClInclude Include="wordlists.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="generator.cpp" />
-    <ClCompile Include="recursive.cpp" />
-    <ClCompile Include="wordlists.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{fbf243ce-bc14-4f1a-97f8-7602b765c88c}</ProjectGuid>
-    <RootNamespace>optimaltreegenerator</RootNamespace>
+    <ProjectGuid>{53ce6e58-d626-49b5-89cc-8fa57c16f0f2}</ProjectGuid>
+    <RootNamespace>FastHashexperiments</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -148,6 +138,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Fast hash experimentsSource.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
