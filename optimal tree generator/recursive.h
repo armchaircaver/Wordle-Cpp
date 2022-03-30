@@ -21,7 +21,7 @@ std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std:
 
 double  avg(bypattern_t& distribution);
 
-bestguess_t bestguess(strvec_t &solutions);
+bestguess_t bestguess(strvec_t& solutions, bool printProgress = false);
 
 void clearpatterncache();
 

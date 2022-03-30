@@ -19,6 +19,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "optimal tree generator", "o
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Fast Hash experiments", "Fast Hash experiments\Fast Hash experiments.vcxproj", "{53CE6E58-D626-49B5-89CC-8FA57C16F0F2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Json precalculated pattern experiment", "Json precalculated pattern experiment\Json precalculated pattern experiment.vcxproj", "{48A13335-D0FF-48AA-A223-5896F68EBC78}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wordle_solver", "wordle_solver\wordle_solver.vcxproj", "{C60B28A2-AB33-4D18-B158-DF2787743EC1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -91,6 +95,22 @@ Global
 		{53CE6E58-D626-49B5-89CC-8FA57C16F0F2}.Release|x64.Build.0 = Release|x64
 		{53CE6E58-D626-49B5-89CC-8FA57C16F0F2}.Release|x86.ActiveCfg = Release|Win32
 		{53CE6E58-D626-49B5-89CC-8FA57C16F0F2}.Release|x86.Build.0 = Release|Win32
+		{48A13335-D0FF-48AA-A223-5896F68EBC78}.Debug|x64.ActiveCfg = Debug|x64
+		{48A13335-D0FF-48AA-A223-5896F68EBC78}.Debug|x64.Build.0 = Debug|x64
+		{48A13335-D0FF-48AA-A223-5896F68EBC78}.Debug|x86.ActiveCfg = Debug|Win32
+		{48A13335-D0FF-48AA-A223-5896F68EBC78}.Debug|x86.Build.0 = Debug|Win32
+		{48A13335-D0FF-48AA-A223-5896F68EBC78}.Release|x64.ActiveCfg = Release|x64
+		{48A13335-D0FF-48AA-A223-5896F68EBC78}.Release|x64.Build.0 = Release|x64
+		{48A13335-D0FF-48AA-A223-5896F68EBC78}.Release|x86.ActiveCfg = Release|Win32
+		{48A13335-D0FF-48AA-A223-5896F68EBC78}.Release|x86.Build.0 = Release|Win32
+		{C60B28A2-AB33-4D18-B158-DF2787743EC1}.Debug|x64.ActiveCfg = Debug|x64
+		{C60B28A2-AB33-4D18-B158-DF2787743EC1}.Debug|x64.Build.0 = Debug|x64
+		{C60B28A2-AB33-4D18-B158-DF2787743EC1}.Debug|x86.ActiveCfg = Debug|Win32
+		{C60B28A2-AB33-4D18-B158-DF2787743EC1}.Debug|x86.Build.0 = Debug|Win32
+		{C60B28A2-AB33-4D18-B158-DF2787743EC1}.Release|x64.ActiveCfg = Release|x64
+		{C60B28A2-AB33-4D18-B158-DF2787743EC1}.Release|x64.Build.0 = Release|x64
+		{C60B28A2-AB33-4D18-B158-DF2787743EC1}.Release|x86.ActiveCfg = Release|Win32
+		{C60B28A2-AB33-4D18-B158-DF2787743EC1}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

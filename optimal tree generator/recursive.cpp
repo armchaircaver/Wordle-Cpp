@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "recursive.h"
+#include <iostream>
 
 double powers[1000];
 int powersinit = 0;
@@ -62,7 +63,7 @@ std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std:
     if (!powersinit) {
         powers[0] = 0.0;
         for (int i = 1; i < 1000; i++)
-            powers[i] = powl((double)i, 1.1);
+            powers[i] = powl((double)i, 1.5);
         powersinit = 1;
     }
 
@@ -188,7 +189,7 @@ int pattern2smallint(std::string s) {
 
 robin_hood::unordered_flat_map< std::string, bestguess_t> bestguess_cache;
 
-bestguess_t bestguess(strvec_t &solutions) {
+bestguess_t bestguess(strvec_t &solutions, bool printProgress ) {
     // find the guess that produces the best average for the solutions
 
  
@@ -237,6 +238,7 @@ bestguess_t bestguess(strvec_t &solutions) {
             if (a < bestavg) {
                 bestavg = a;
                 bestguess = guess;
+                if(printProgress) printf("best guess so far: %s, average to solve: %f\n", guess.c_str(), a);
             }
         }
 
@@ -245,7 +247,13 @@ bestguess_t bestguess(strvec_t &solutions) {
         // we have found the next best to a full spread, and can't do better by calling shortlist
         return bestguess_t{ 1.0, reserve_guess };
 
-    std::vector< std::pair < double, std::string>> sl = shortlist(15, solutions);
+    std::vector< std::pair < double, std::string>> sl = shortlist(50, solutions);
+    if (printProgress) {
+        printf("shortlist:\n");
+        for (auto w : sl)
+            std::cout << w.second << ",";
+        std::cout << "\n";
+    }
     
     for (auto x : sl) {
         std::string guess = x.second;
@@ -267,10 +275,11 @@ bestguess_t bestguess(strvec_t &solutions) {
             return bestguess_t{ 1.0, guess };
 
         double a = avg(solsbypattern);
-        //printf("shortlist guess %s, average %f\n", guess.c_str(), a);
         if (a < bestavg) {
             bestavg = a;
             bestguess = guess;
+            if (printProgress) printf("best guess so far: %s, average to solve: %f\n", guess.c_str(), a);
+
         }
  
         if (bestguess == "?????") {
