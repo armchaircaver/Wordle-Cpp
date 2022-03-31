@@ -17,8 +17,9 @@ void clearpatterncache() {
 
 std::string  pattern(std::string& solutionword, std::string& guess) {
 
-    //if (pattern_cache.find(guess+solutionword) != pattern_cache.end())
-    //    return pattern_cache[guess + solutionword];
+    auto pc_find = pattern_cache.find(guess + solutionword);
+    if (pc_find != pattern_cache.end())
+        return pc_find->second;
 
     std::string list_solutionword = solutionword;
     std::string p = ".....";
@@ -48,7 +49,7 @@ std::string  pattern(std::string& solutionword, std::string& guess) {
             list_solutionword[list_solutionword.find(guess[i])] = '.';
         }
     }
-    //pattern_cache[guess+solutionword] = p;
+    pattern_cache[guess+solutionword] = p;
     return p;
 }
 
@@ -116,13 +117,20 @@ std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std:
     return slist;
 }
 
-double  avg(bypattern_t & distribution) {
-    double numerator = 0.0;
-    int denominator = 0;
-    for (auto p : distribution) {
+double  avg(bypattern_t & distribution, double cutoff) {
+    // find the average to solve the distribution
+    // if the running average exceeds the cutoff, abort the search
 
+    // first, calculate the denominator
+    int denominator = 0;
+    for (auto p : distribution) 
         denominator += (int)p.second.size();
 
+    double numerator_cutoff = cutoff * (double)denominator;
+
+    double numerator = 0.0;
+    for (auto p : distribution) {
+ 
         if (int2str(p.first) == "GGGGG")
             continue;
 
@@ -134,8 +142,10 @@ double  avg(bypattern_t & distribution) {
 
         else
             numerator += (minavg(p.second) + 1.0) * p.second.size();
+
+        if (numerator > numerator_cutoff)
+            break;
     }
-    //printf("average %f / %d\n", numerator, denominator);
     return numerator / (double)denominator;
 }
 
@@ -218,13 +228,7 @@ bestguess_t bestguess(strvec_t &solutions, bool printProgress ) {
         for (auto guess : solutions) {
 
             bypattern_t solsbypattern = splitbypattern(guess, solutions);
-            /*
-            for (auto sol : solutions) {
-                std::string p = pattern(sol, guess);
-                solsbypattern[p].push_back(sol);
-            }
-            */ 
-
+ 
             if (solsbypattern.size() == solutions.size())
                 // can't do better than this
                 return bestguess_t{ (float)(solutions.size()-1)/(float)solutions.size(), guess };
@@ -232,13 +236,13 @@ bestguess_t bestguess(strvec_t &solutions, bool printProgress ) {
             if (solsbypattern.size() == solutions.size() - 1)
                 reserve_guess = guess;
 
-            double a = avg(solsbypattern);
+            double a = avg(solsbypattern, bestavg);
             //printf("solution word guess %s, average %f\n", guess.c_str(), a);
 
             if (a < bestavg) {
                 bestavg = a;
                 bestguess = guess;
-                if(printProgress) printf("best guess so far: %s, average to solve: %f\n", guess.c_str(), a);
+                if(printProgress) printf("best guess so far: '%s', average to solve: %f\n", guess.c_str(), a);
             }
         }
 
@@ -274,12 +278,14 @@ bestguess_t bestguess(strvec_t &solutions, bool printProgress ) {
             // can't do better than this
             return bestguess_t{ 1.0, guess };
 
-        double a = avg(solsbypattern);
+        double a = avg(solsbypattern, bestavg);
         if (a < bestavg) {
             bestavg = a;
             bestguess = guess;
             if (printProgress) printf("best guess so far: %s, average to solve: %f\n", guess.c_str(), a);
-
+        }
+        else {
+            if (printProgress) printf("'%s' not as good as '%s'\n", guess.c_str(), bestguess.c_str());
         }
  
         if (bestguess == "?????") {
