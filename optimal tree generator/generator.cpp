@@ -81,4 +81,8 @@ int main() {
     printf("total guesses %d\n", totalguesses);
     printf("average = %f\n", (double)totalguesses / (double)totalsolsfound);
     printf("%lld seconds\n", elapsed);
+    stats_t stats = export_stats();
+    printf("%lld patterncache_hits, %lld smallest_cutoff_hits,  %lld cutoff_hits,  %lld bestguesscache_hits\n", stats.patterncache_hits, stats.smallest_cutoff_hits, stats.cutoff_hits, stats.bestguesscache_hits);
+    printf("%lld patterncache_misses\n", stats.patterncache_misses);
+
 }

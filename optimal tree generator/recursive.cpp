@@ -11,19 +11,65 @@ robin_hood::unordered_flat_map< std::string,  std::string> pattern_cache;
 
 PrimaryWords primarywords;
 
+stats_t stats;
+
+stats_t export_stats() {
+    return stats;
+}
+
+
 void clearpatterncache() {
     pattern_cache.clear();
  }
+bypattern_t splitbypattern(std::string& guess, strvec_t& solutions) {
+    bypattern_t solsbypattern;
+    for (auto sol : solutions) {
+        std::string p = pattern(sol, guess);
+        solsbypattern[str2int(p)].push_back(sol);
+    }
+    return solsbypattern;
+
+}
+//------------------------------------------------------------------------------------------------------------------------------------
+std::string concat(strvec_t v) {
+    std::string res;
+    for (auto s : v)
+        res += s + ",";
+    return res;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------
+uint64_t str2int(std::string s) {
+    uint64_t i = 0ull;
+    memcpy(&i, s.c_str(), 5);
+    return i;
+}
+std::string int2str(uint64_t i) {
+    char c[6] = { '?','?','?','?','?', 0 };
+    memcpy(&c, &i, 5);
+    return std::string(c);
+}
+//------------------------------------------------------------------------------------------------------------------------------------
+int pattern2smallint(std::string s) {
+    int i = 0;
+    int pos = 0;
+    for (auto c : s) {
+        i |= (c & 3) << pos;
+        pos += 2;
+    }
+    return i;
+}
 
 std::string  pattern(std::string& solutionword, std::string& guess) {
 
     auto pc_find = pattern_cache.find(guess + solutionword);
-    if (pc_find != pattern_cache.end())
+    if (pc_find != pattern_cache.end()) {
+        stats.patterncache_hits++;
         return pc_find->second;
+    }
 
     std::string list_solutionword = solutionword;
     std::string p = ".....";
-    //int solbitmap = primarywords.wordbitmap[solutionword];
 
     // find greens first, and remove the letter from the solution
     // so that we don't get false yellows for a repeated letter in the guess word
@@ -38,8 +84,6 @@ std::string  pattern(std::string& solutionword, std::string& guess) {
     for (int i = 0; i < 5; i++) {
         if (p[i] == 'G')
             continue;
-        //if (((guess[i] - 'a') & solbitmap) == 0)
-        //    continue;
 
         // if guess[i] is in list_solutionword - this is a bottleneck
         //if (list_solutionword.find(guess[i]) != std::string::npos)
@@ -49,6 +93,7 @@ std::string  pattern(std::string& solutionword, std::string& guess) {
             list_solutionword[list_solutionword.find(guess[i])] = '.';
         }
     }
+    stats.patterncache_misses++;
     pattern_cache[guess+solutionword] = p;
     return p;
 }
@@ -119,7 +164,7 @@ std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std:
 
 double  avg(bypattern_t & distribution, double cutoff) {
     // find the average to solve the distribution
-    // if the running average exceeds the cutoff, abort the search
+    // If the running average or smalest average exceeds the cutoff, abort the search
 
     // first, calculate the denominator
     int denominator = 0;
@@ -128,6 +173,26 @@ double  avg(bypattern_t & distribution, double cutoff) {
 
     double numerator_cutoff = cutoff * (double)denominator;
 
+    // calculate the smallest the numerator can possibly be
+    // if it is larger than the cutoff, we don't need to bother calculating the actual value
+    double smallest_numerator = 0.0;
+    for (auto p : distribution) {
+
+        if (int2str(p.first) == "GGGGG")
+            continue;
+
+        if (p.second.size() == 1)
+            smallest_numerator += 1.0;
+
+        else
+            smallest_numerator += 2.0 * p.second.size() - 1.0;
+    }
+    if (smallest_numerator > numerator_cutoff) {
+        stats.smallest_cutoff_hits++;
+        return smallest_numerator / (double)denominator;
+    }
+
+    // now calculate the numerator, aborting if it exceeds the cutoff
     double numerator = 0.0;
     for (auto p : distribution) {
  
@@ -141,10 +206,12 @@ double  avg(bypattern_t & distribution, double cutoff) {
             numerator += 3.0;
 
         else
-            numerator += (minavg(p.second) + 1.0) * p.second.size();
+            numerator += (bestguess(p.second).average + 1.0) * p.second.size();
 
-        if (numerator > numerator_cutoff)
+        if (numerator > numerator_cutoff) {
+            stats.cutoff_hits++;
             break;
+        }
     }
     return numerator / (double)denominator;
 }
@@ -152,49 +219,13 @@ double  avg(bypattern_t & distribution, double cutoff) {
 //std::unordered_map<std::string, double> minavg_cache;
 robin_hood::unordered_flat_map< std::string, double> minavg_cache;
 
+/*
 double minavg(strvec_t& solutions) {
     bestguess_t bg = bestguess(solutions);
     return bg.average;
 }
+*/
 //------------------------------------------------------------------------------------------------------------------------------------
-bypattern_t splitbypattern(std::string& guess, strvec_t& solutions) {
-    bypattern_t solsbypattern;
-    for (auto sol : solutions) {
-        std::string p = pattern(sol, guess);
-        solsbypattern[str2int(p)].push_back(sol);
-    }
-    return solsbypattern;
-
-}
-//------------------------------------------------------------------------------------------------------------------------------------
-std::string concat(strvec_t v) {
-    std::string res;
-    for (auto s : v)
-        res += s+",";
-    return res;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------
-uint64_t str2int(std::string s) {
-    uint64_t i = 0ull;
-    memcpy(&i, s.c_str(), 5);
-    return i;
-}
-std::string int2str(uint64_t i) {
-    char c[6] = { '?','?','?','?','?', 0 };
-    memcpy(&c, &i, 5);
-    return std::string(c);
-}
-//------------------------------------------------------------------------------------------------------------------------------------
-int pattern2smallint(std::string s) {
-    int i = 0;
-    int pos = 0;
-    for (auto c : s) {
-        i |= (c & 3) << pos;
-        pos += 2;
-    }
-    return i;
-}
 //------------------------------------------------------------------------------------------------------------------------------------
 
 robin_hood::unordered_flat_map< std::string, bestguess_t> bestguess_cache;
@@ -214,7 +245,7 @@ bestguess_t bestguess(strvec_t &solutions, bool printProgress ) {
     // see if we have cached the result
     std::string cs = concat(solutions);
     if (bestguess_cache.find(cs) != bestguess_cache.end()) {
-        //printf("bestguess cache used for %s\n", cs.c_str());
+        stats.bestguesscache_hits++;
         return bestguess_cache[cs];
     }
     
@@ -247,9 +278,11 @@ bestguess_t bestguess(strvec_t &solutions, bool printProgress ) {
         }
 
     }
-    if (reserve_guess != "?????")
+    if (reserve_guess != "?????") {
         // we have found the next best to a full spread, and can't do better by calling shortlist
+        bestguess_cache[cs] = bestguess_t{ 1.0, reserve_guess };
         return bestguess_t{ 1.0, reserve_guess };
+    }
 
     std::vector< std::pair < double, std::string>> sl = shortlist(50, solutions);
     if (printProgress) {
@@ -261,12 +294,6 @@ bestguess_t bestguess(strvec_t &solutions, bool printProgress ) {
     
     for (auto x : sl) {
         std::string guess = x.second;
-        double cost = x.first;
-        //printf(" %f, %s \n", cost, guess.c_str());
-    }
-
-    for (auto x : sl) {
-        std::string guess = x.second;
 
         bypattern_t solsbypattern;
         for (auto sol : solutions) {
@@ -274,9 +301,11 @@ bestguess_t bestguess(strvec_t &solutions, bool printProgress ) {
             solsbypattern[str2int(p)].push_back(sol);
         }
 
-        if (solsbypattern.size() == solutions.size())
+        if (solsbypattern.size() == solutions.size()) {
             // can't do better than this
+            bestguess_cache[cs] = bestguess_t{ 1.0, guess };
             return bestguess_t{ 1.0, guess };
+        }
 
         double a = avg(solsbypattern, bestavg);
         if (a < bestavg) {
