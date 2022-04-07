@@ -29,5 +29,8 @@
     <ClInclude Include="..\Json precalculated pattern experiment\json.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\optimal tree generator\recursive.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

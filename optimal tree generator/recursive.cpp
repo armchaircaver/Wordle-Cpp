@@ -4,8 +4,19 @@
 #include "recursive.h"
 #include <iostream>
 
-double powers[1000];
-int powersinit = 0;
+class Estimates {
+public:
+    double estimates[1000];
+
+    Estimates() {
+        estimates[0] = 0.0;
+        for (int i = 1; i < 1000; i++)
+            estimates[i] = powl((double)i, 1.1);
+    }
+};
+//----------------------------------------------------------------------------------------------------
+
+Estimates e;
 
 robin_hood::unordered_flat_map< std::string,  std::string> pattern_cache;
 
@@ -105,13 +116,14 @@ std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std:
 
 
     std::vector< std::pair < double, std::string>> slist;
- 
+    /*
     if (!powersinit) {
         powers[0] = 0.0;
         for (int i = 1; i < 1000; i++)
             powers[i] = powl((double)i, 1.5);
         powersinit = 1;
     }
+    */
 
     bypattern_t solsbypattern;
 
@@ -137,7 +149,7 @@ std::vector< std::pair < double, std::string>> shortlist(int n, std::vector<std:
             // squaresum += 2 * x - 1
 
             // however, this seems to produce a better shortlist
-            squaresum += powers[x]-powers[x-1];
+            squaresum += e.estimates[x]-e.estimates[x-1];
 
 
             if (slist.size() == n && squaresum > slist.back().first)
@@ -284,7 +296,7 @@ bestguess_t bestguess(strvec_t &solutions, bool printProgress ) {
         return bestguess_t{ 1.0, reserve_guess };
     }
 
-    std::vector< std::pair < double, std::string>> sl = shortlist(50, solutions);
+    std::vector< std::pair < double, std::string>> sl = shortlist(30, solutions);
     if (printProgress) {
         printf("shortlist:\n");
         for (auto w : sl)
