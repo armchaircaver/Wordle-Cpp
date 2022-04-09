@@ -5,13 +5,19 @@
 #include <iostream>
 
 class Estimates {
+    // estimate[n] is an estimate of the number of guesses after the best first guess 
+    // for a set of solution words of length n
 public:
     double estimates[1000];
 
     Estimates() {
         estimates[0] = 0.0;
-        for (int i = 1; i < 1000; i++)
-            estimates[i] = powl((double)i, 1.1);
+        estimates[1] = 0.00;
+        estimates[2] = 1.00;
+        estimates[3] = 2.55;
+
+        for (int i = 4; i < 1000; i++)
+            estimates[i] = powl((double)i, 1.1) - 1.0;
     }
 };
 //----------------------------------------------------------------------------------------------------
