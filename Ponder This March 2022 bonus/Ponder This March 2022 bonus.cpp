@@ -87,6 +87,10 @@ int main() {
     std::unordered_map<std::string, int[THREEp7]> guessmap;
 
     for (auto guess : solutions) {
+ 
+        if (guess != "1584269")
+            continue;
+        
         int numUniqeChars = (int)std::unordered_set<char>(std::begin(guess), std::end(guess)).size();
         if (numUniqeChars < 7)
             continue;
@@ -111,6 +115,9 @@ int main() {
         if (numUniqeChars < 7)
             continue;
 
+        if (x != "1584269")
+            continue;
+
         
         int sum = 0;
         for (int i = 0; i < THREEp7; i++)
@@ -124,6 +131,9 @@ int main() {
 
     uint64_t smallest = 1ULL << 63;
     for (auto guess : solutions) {
+        if (guess != "1584269")
+            continue;
+
         int numUniqeChars = (int)std::unordered_set<char>(std::begin(guess), std::end(guess)).size();
         if (numUniqeChars < 7)
             continue;
@@ -132,7 +142,7 @@ int main() {
         for (int i = 0; i < THREEp7; i++)
             M += (uint64_t)guessmap[guess][i] * (uint64_t)guessmap[guess][i];
         if (M < smallest) {
-            printf("%s, %lld, %f\n", guess.c_str(), M, float(M) / solutions.size());
+            printf("%s, %lld / %lld =  %f\n", guess.c_str(), M,solutions.size(),  double(M) / solutions.size());
             smallest = M;
         }
     }

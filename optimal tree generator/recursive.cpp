@@ -38,6 +38,8 @@ stats_t export_stats() {
 void clearpatterncache() {
     pattern_cache.clear();
  }
+
+
 bypattern_t splitbypattern(std::string& guess, strvec_t& solutions) {
     bypattern_t solsbypattern;
     for (auto sol : solutions) {
@@ -237,20 +239,33 @@ double  avg(bypattern_t & distribution, double cutoff) {
 //std::unordered_map<std::string, double> minavg_cache;
 robin_hood::unordered_flat_map< std::string, double> minavg_cache;
 
-/*
-double minavg(strvec_t& solutions) {
-    bestguess_t bg = bestguess(solutions);
-    return bg.average;
-}
-*/
-//------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
 
 robin_hood::unordered_flat_map< std::string, bestguess_t> bestguess_cache;
 
+// from https://www.froglogic.com/blog/recursion-depth-counting/
+class RecursionCounter
+{
+public:
+    inline RecursionCounter() { ++cnt; /*printf("depth %d\n", cnt);*/ }
+    inline ~RecursionCounter() {
+        if (pattern_cache.size() > 100000 and cnt <= 2) {
+            //printf("depth %d, clearing pattern cache\n", cnt);
+            pattern_cache.clear();
+        }
+        --cnt; 
+    }
+    inline operator int() const { return cnt; }
+private:
+    static int cnt;
+};
+int RecursionCounter::cnt = 0;
+
+
 bestguess_t bestguess(strvec_t &solutions, bool printProgress ) {
     // find the guess that produces the best average for the solutions
 
+    RecursionCounter recursionDepth;
  
     if (solutions.size() == 1)
         //no need to search
@@ -291,7 +306,7 @@ bestguess_t bestguess(strvec_t &solutions, bool printProgress ) {
             if (a < bestavg) {
                 bestavg = a;
                 bestguess = guess;
-                if(printProgress) printf("best guess so far: '%s', average to solve: %f\n", guess.c_str(), a);
+                if(printProgress) printf("best guess from solution words: '%s', average to solve: %f\n", guess.c_str(), a);
             }
         }
 
@@ -302,11 +317,11 @@ bestguess_t bestguess(strvec_t &solutions, bool printProgress ) {
         return bestguess_t{ 1.0, reserve_guess };
     }
 
-    std::vector< std::pair < double, std::string>> sl = shortlist(30, solutions);
+    std::vector< std::pair < double, std::string>> sl = shortlist(40, solutions);
     if (printProgress) {
         printf("shortlist:\n");
         for (auto w : sl)
-            std::cout << w.second << ",";
+            std::cout << w.second << " (" << w.first << ")" << ", ";
         std::cout << "\n";
     }
     
