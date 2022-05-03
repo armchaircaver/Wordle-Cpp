@@ -5,34 +5,35 @@
 #include "../optimal tree generator/recursive.h"
 #include "../optimal tree generator/wordlists.h"
 
-class Patterns {
+class PatternCounts {
 public:
-	std::unordered_map<std::string, std::unordered_set<std::string>> solution_patterns;
+	std::unordered_map<std::string, std::unordered_map<std::string, int>> solution_pattern_counts;
 
-	Patterns() {
-		std::ifstream input("precalculated_patterns.json");
+	PatternCounts() {
+		std::ifstream input("precalculated_pattern_counts.json");
 		nlohmann::json j;
 
 		input >> j;
 
-		solution_patterns = j;
-		std::cout << solution_patterns.size() << " solution_patterns loaded\n";
+		solution_pattern_counts = j;
+		std::cout << solution_pattern_counts.size() << " solution_pattern_counts loaded\n";
 	}
 
 };
 
-Patterns solpats;
+PatternCounts solpats;
+
 
 PrimaryWords pw;
 
 strvec_t patternmatch(std::string& p, strvec_t& inputlist) {
 	// patternlist is a pattern from other people's posts of results, e.g "..YGG"
-		// The best patterns to use are those with fewest white squares
+	// The best patterns to use are those with fewest white squares
 
 	strvec_t outputlist;
 	for (auto w : inputlist)
-		if (solpats.solution_patterns[w].find(p) != solpats.solution_patterns[w].end())
-			outputlist.push_back(w);
+		if (solpats.solution_pattern_counts[w].find(p) != solpats.solution_pattern_counts[w].end())
+		outputlist.push_back(w);
 
 	return outputlist;
 }
@@ -68,17 +69,13 @@ strvec_t split(std::string & lineInput) {
 //----------------------------------------------------------------------------
 strvec_t repeatmatch(std::string& p, strvec_t& inputlist, int repeatcount) {
 	strvec_t outputlist;
-	for (auto w : inputlist) {
-		int count = 0;
-		for (auto x : pw.alloptions)
-			if (pattern(w, x) == p)
-				count++;
-		if (count >= repeatcount)
-			outputlist.push_back(w);
-		clearpatterncache();
-	}
+	for (auto w : inputlist)
+		if (solpats.solution_pattern_counts[w].find(p) != solpats.solution_pattern_counts[w].end())
+			if (solpats.solution_pattern_counts[w][p] >= repeatcount)
+				outputlist.push_back(w);
+
 	return outputlist;
- }
+}
 //----------------------------------------------------------------------------
 void standardise(std::string& pattern) {
 	std::replace(pattern.begin(), pattern.end(), 'W', '.');
