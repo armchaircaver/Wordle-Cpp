@@ -64,9 +64,6 @@ void traversetree(int depth, std::string& startguess, strvec_t& inputlist) {
 
 int main() {
 
-    PrimaryWords primarywords;
- 
-   
     std::string startguess ;
     std::cout << "Enter starting word: ";
     std::cin >> startguess;

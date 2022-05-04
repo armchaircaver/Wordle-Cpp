@@ -24,7 +24,7 @@ public:
 PatternCounts solpats;
 
 
-PrimaryWords pw;
+//PrimaryWords pw;
 
 strvec_t patternmatch(std::string& p, strvec_t& inputlist) {
 	// patternlist is a pattern from other people's posts of results, e.g "..YGG"
@@ -86,8 +86,8 @@ void standardise(std::string& pattern) {
 
 int main() {
 
-	PrimaryWords pw;
-	strvec_t W = pw.solutions;
+	//PrimaryWords pw;
+	strvec_t W = primarywords.solutions;
 
 
 	std::string lineInput;

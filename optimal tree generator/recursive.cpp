@@ -1,8 +1,10 @@
- #include "wordlists.h"
+#include "wordlists.h"
 #include <algorithm>
 #include <stdexcept>
 #include "recursive.h"
 #include <iostream>
+
+PrimaryWords primarywords;
 
 class Estimates {
     // estimate[n] is an estimate of the number of guesses after the best first guess 
@@ -26,7 +28,6 @@ Estimates e;
 
 robin_hood::unordered_flat_map< std::string,  std::string> pattern_cache;
 
-PrimaryWords primarywords;
 
 stats_t stats;
 
