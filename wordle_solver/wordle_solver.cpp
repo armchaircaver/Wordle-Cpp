@@ -77,7 +77,8 @@ strvec_t repeatmatch(std::string& p, strvec_t& inputlist, int repeatcount) {
 	return outputlist;
 }
 //----------------------------------------------------------------------------
-void standardise(std::string& pattern) {
+void standardisepattern(std::string& pattern) {
+	std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::toupper);
 	std::replace(pattern.begin(), pattern.end(), 'W', '.');
 	std::replace(pattern.begin(), pattern.end(), 'B', '.');
 
@@ -102,7 +103,7 @@ int main() {
 		if (words.size() == 1) {
 			// assume it is a pattern
 
-			standardise(words[0]);
+			standardisepattern(words[0]);
 
 			W = patternmatch(words[0], W);
 			printf("Pattern %s : %zd words\n", words[0].c_str(), W.size());
@@ -112,7 +113,7 @@ int main() {
 			if (!words[1].empty() && std::all_of(words[1].begin(), words[1].end(), ::isdigit)) {
 
 				// it is a "pattern repeatcount"
-				standardise(words[0]);
+				standardisepattern(words[0]);
 
 				int repeatcount = atol(words[1].c_str());
 				printf("Pattern %s repeated %d times :", words[0].c_str(), repeatcount);
@@ -122,7 +123,10 @@ int main() {
 			else {
 				// it is a guess-pattern pair 
 
-				standardise(words[1]);
+				standardisepattern(words[1]);
+
+				std::transform(words[0].begin(), words[0].end(), words[0].begin(), ::tolower);
+
 
 				W = guessmatch(words[0], words[1], W);
 				printf("Guess %s %s : %zd words\n", words[0].c_str(), words[1].c_str(), W.size());
