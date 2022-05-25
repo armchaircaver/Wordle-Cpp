@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 
 std::vector<std::string> read_csv(std::string filename) {
     // Reads a single line CSV file into a vector of string
@@ -11,7 +12,11 @@ std::vector<std::string> read_csv(std::string filename) {
     std::ifstream myFile(filename);
 
     // Make sure the file is open
-    if (!myFile.is_open()) throw std::runtime_error("Could not open file");
+    if (!myFile.is_open()) {
+        std::cout << "Could not open file " << filename << "\n";
+        exit(1);
+    }
+
 
     // Helper vars
     std::string line, word;
@@ -45,11 +50,12 @@ PrimaryWords::PrimaryWords() {
  
         solutions = read_csv("solutions.txt");
         alloptions = read_csv("guesses.txt");
+        printf("guesses loaded, %zd items\n", alloptions.size());
 
         alloptions.insert(alloptions.end(), solutions.begin(), solutions.end());
 
-        printf("solutions vector initialised, %zd items\n", solutions.size());
-        printf("alloptions vector initialised, %zd items\n", alloptions.size());
+        printf("solutions initialised, %zd items\n", solutions.size());
+        printf("alloptions (solutions+guesses) initialised, %zd items\n", alloptions.size());
     }
 
 }
