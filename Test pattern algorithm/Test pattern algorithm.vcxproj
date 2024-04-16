@@ -141,6 +141,9 @@
   <ItemGroup>
     <ClCompile Include="test pattern algorithm.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="timer.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

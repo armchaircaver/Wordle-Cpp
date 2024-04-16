@@ -1,6 +1,10 @@
 #include <cstdio>
 #include <vector>
 #include <string>
+#include "timer.h"
+#include <iostream>
+
+
 
 std::string  pattern(std::string& solutionword, std::string& guess) {
     std::string list_solutionword = solutionword;
@@ -37,4 +41,24 @@ int main() {
     sol = "abcde";  guess = "aaabf";
     printf("%s\n", pattern(sol, guess).c_str());
 
+    std::vector<std::string> guesses = { "cratx", "xrate", "crate", "trace", "salet", "uvwxy" };
+    std::string solution = "crate";
+
+    for (auto g : guesses) {
+        std::cout << solution << "," << g << "," << pattern(solution, g) << "\n";
+    }
+
+    int n = guesses.size();
+    Timer t;
+    t.start();
+    std::string p;
+    int m = 10'000'000;
+    for (int i = 0; i < m; i++) {
+        p = pattern(guesses[(i + 1) % n], guesses[i % n]);
+    }
+    t.end();
+    std::cout << "time " << t.ms() << " millisec for " << m << " patterns, last pattern = " << p << "\n";
+    std::cout <<  (float)t.ms()/(float)m << " millisec per item\n";
 }
+
+
